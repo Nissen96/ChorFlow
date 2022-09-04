@@ -18,6 +18,11 @@ dependencies {
     antlr("org.antlr:antlr4:4.10.1")
 }
 
+tasks.generateGrammarSource {
+    outputDirectory = File("src/main/kotlin/chorflow/grammar")
+    arguments = arguments + listOf("-no-listener", "-visitor", "-package", "chorflow.grammar")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
@@ -37,7 +42,3 @@ application {
     mainClass.set("chorflow.MainKt")
 }
 
-tasks.generateGrammarSource {
-    outputDirectory = File("src/main/kotlin/chorflow/grammar")
-    arguments = arguments + listOf("-no-listener", "-visitor", "-package", "chorflow.grammar")
-}

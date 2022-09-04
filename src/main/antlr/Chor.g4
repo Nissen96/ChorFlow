@@ -1,12 +1,12 @@
 grammar Chor;
 
-program: procedureList? choreography?;
+program: procedureList choreography?;
 
-procedureList: procedure (',' procedure)*;
+procedureList: (procedure (',' procedure)*)?;
 procedure: ID '(' processList ')' '=' choreography;
 
 choreography: instruction ';' choreography
-            | TERMINATED
+            | INT  // Only '0' is valid, check during AST generation
             ;
 
 instruction: interaction
@@ -37,7 +37,6 @@ expression: op=('-' | '!') expression
 WHITESPACE: [ \t\r\n] -> skip;
 COMMENT: '/*' .*? '*/' -> skip;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
-TERMINATED: 'END';
 ID  : [a-zA-Z][A-Za-z_0-9]*;
 INT : [0-9]+;
 BOOL: 'true' | 'false';
