@@ -25,6 +25,7 @@ abstract class Visitor {
 
     open fun visit(procedureCall: ProcedureCall) {}
 
+    open fun preVisit(program: Program) {}
     open fun preMidVisit(program: Program) {}
     open fun postMidVisit(program: Program) {}
 

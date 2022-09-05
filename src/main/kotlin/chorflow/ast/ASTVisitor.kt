@@ -2,8 +2,6 @@ package chorflow.ast
 
 import chorflow.grammar.ChorBaseVisitor
 import chorflow.grammar.ChorParser
-import org.antlr.v4.runtime.NoViableAltException
-import org.antlr.v4.runtime.RecognitionException
 
 class ASTVisitor : ChorBaseVisitor<ASTNode>() {
 
@@ -27,11 +25,9 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     }
 
     override fun visitChoreography(ctx: ChorParser.ChoreographyContext): Choreography? {
-        if (ctx.INT() != null) {
-            if (ctx.INT().text == "0")
-                return null
-            throw Exception("Invalid token!")
-        }
+        if (ctx.ZERO() != null)
+            return null
+
         return Choreography(
             ctx.instruction().accept(this) as Instruction,
             ctx.choreography().accept(this) as Choreography?,

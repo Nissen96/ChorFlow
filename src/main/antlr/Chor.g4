@@ -6,7 +6,7 @@ procedureList: (procedure (',' procedure)*)?;
 procedure: ID '(' processList ')' '=' choreography;
 
 choreography: instruction ';' choreography
-            | INT  // Only '0' is valid, check during AST generation
+            | ZERO
             ;
 
 instruction: interaction
@@ -30,7 +30,10 @@ expression: op=('-' | '!') expression
           | expression op=('&&' | '||') expression
           | '(' expression ')'
           | ID '(' (expression (',' expression)*)? ')'
-          | (ID | INT | BOOL | STR)
+          | ID
+          | (ZERO | INT)
+          | BOOL
+          | STR
           ;
 
 
@@ -38,6 +41,9 @@ WHITESPACE: [ \t\r\n] -> skip;
 COMMENT: '/*' .*? '*/' -> skip;
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 ID  : [a-zA-Z][A-Za-z_0-9]*;
-INT : [0-9]+;
+
+// 0 acts as the terminated choreography, need to split up INT rule to avoid competing lexemes
+ZERO: '0';
+INT : [0-9][0-9]+ | [1-9][0-9]*;
 BOOL: 'true' | 'false';
 STR : '"' ~["\\]* '"' { setText(getText().substring(1, getText().length() - 1)); };

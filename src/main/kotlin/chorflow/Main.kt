@@ -15,5 +15,5 @@ fun main(args: Array<String>) {
     val parser = ChorParser(tokens)
     val cst = parser.program()
     val ast = ASTVisitor().visit(cst) as Program
-    ast.accept(PrettyPrintVisitor())
+    ast.accept(PrettyPrintVisitor(indentation = 4, condensed = "-c" in args))
 }

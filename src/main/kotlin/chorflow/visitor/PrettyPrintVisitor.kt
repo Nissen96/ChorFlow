@@ -2,11 +2,18 @@ package chorflow.visitor
 
 import chorflow.ast.*
 
-class PrettyPrintVisitor(private val indentation: Int = 4) : Visitor() {
+class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed: Boolean = false) : Visitor() {
     private var level = 0
+    private val separator = if (condensed) " " else "\n"
 
     private fun printIndented(text: Any = "") {
-        print(" ".repeat(indentation * level) + "$text")
+        if (!condensed)
+            print(" ".repeat(indentation * level))
+        print(text)
+    }
+
+    override fun preVisit(program: Program) {
+        println("/* Procedure Definitions */")
     }
 
     override fun preMidVisit(program: Program) {
@@ -14,7 +21,8 @@ class PrettyPrintVisitor(private val indentation: Int = 4) : Visitor() {
     }
 
     override fun postMidVisit(program: Program) {
-        println()
+        if (condensed) println()
+        println("\n/* Choreography */")
     }
 
     override fun visit(procedure: Procedure) {
@@ -26,8 +34,12 @@ class PrettyPrintVisitor(private val indentation: Int = 4) : Visitor() {
     }
 
     override fun postVisit(choreography: Choreography) {
-        print(";\n")
-        choreography.continuation ?: printIndented("0\n")
+        print(";")
+        if (choreography.continuation == null) {
+            print(" 0${if (condensed) "" else "\n"}")
+        } else {
+            print(separator)
+        }
     }
 
     override fun preVisit(parenthesizedInstruction: ParenthesizedInstruction) {
@@ -47,13 +59,13 @@ class PrettyPrintVisitor(private val indentation: Int = 4) : Visitor() {
     }
 
     override fun preMidVisit(conditional: Conditional) {
-        print(" then\n")
+        print(" then$separator")
         level++
     }
 
     override fun postMidVisit(conditional: Conditional) {
         level--
-        printIndented("else\n")
+        print(" else$separator")
         level++
     }
 

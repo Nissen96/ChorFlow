@@ -10,6 +10,7 @@ class Program(
     charPosition: Int
 ) : ASTNode(lineNumber, charPosition) {
     override fun accept(visitor: Visitor) {
+        visitor.preVisit(this)
         procedures.forEach({ it.accept(visitor) }, doBetween = { visitor.preMidVisit(this) })
         visitor.postMidVisit(this)
         choreography?.accept(visitor)
