@@ -41,4 +41,3 @@ configure<SourceSetContainer> {
 application {
     mainClass.set("chorflow.MainKt")
 }
-
