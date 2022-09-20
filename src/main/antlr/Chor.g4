@@ -19,7 +19,7 @@ instruction: interaction
 
 interaction: ID '.' expression '->' ID '.' ID;
 assignment: ID '.' ID ':=' expression;
-selection: ID '->' ID '.' ID;
+selection: ID '->' ID '[' ID ']';
 conditional: 'if' ID '.' expression 'then' choreography 'else' choreography;
 procedureCall: ID '(' processList ')';
 processList: ID ',' ID (',' ID)*;  // At least two processes
