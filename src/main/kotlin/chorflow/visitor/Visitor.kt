@@ -29,6 +29,7 @@ abstract class Visitor {
     open fun preVisit(program: Program) {}
     open fun preMidVisit(program: Program) {}
     open fun postMidVisit(program: Program) {}
+    open fun postVisit(program: Program) {}
 
     open fun visit(selection: Selection) {}
 }

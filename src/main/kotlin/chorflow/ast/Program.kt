@@ -14,5 +14,6 @@ class Program(
         procedures.forEach({ it.accept(visitor) }, doBetween = { visitor.preMidVisit(this) })
         visitor.postMidVisit(this)
         choreography?.accept(visitor)
+        visitor.postVisit(this)
     }
 }

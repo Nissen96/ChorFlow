@@ -29,6 +29,7 @@ expression: op=('-' | '!') expression
           | expression op=('==' | '!=' | '<' | '>' | '<=' | '>=') expression
           | expression op=('&&' | '||') expression
           | '(' expression ')'
+          | '(' (expression (',' expression)*)? ')'
           | ID '(' (expression (',' expression)*)? ')'
           | ID
           | (ZERO | INT)

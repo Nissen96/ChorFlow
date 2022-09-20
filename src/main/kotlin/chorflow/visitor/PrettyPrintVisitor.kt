@@ -25,6 +25,10 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
         println("\n/* Choreography */")
     }
 
+    override fun postVisit(program: Program) {
+        if (condensed) println()
+    }
+
     override fun preVisit(procedure: Procedure) {
         print("${procedure.id}(${procedure.processParameters.joinToString(", ")}) =$separator")
         level++

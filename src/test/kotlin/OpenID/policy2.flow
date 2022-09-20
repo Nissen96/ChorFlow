@@ -1,0 +1,14 @@
+// Explicit + implicit flow policy
+u       -> info, pwd, s, rp, ip
+rp      -> u, ip, s, user, report
+ip      -> u, rp, id, pwd
+s       -> u, rp, class, data
+name    -> user
+user    -> id, class
+id      -> ip, report
+class   -> data
+my_pwd  -> pwd
+report  ->
+pwd     -> ip
+data    -> data, s, info
+info    ->

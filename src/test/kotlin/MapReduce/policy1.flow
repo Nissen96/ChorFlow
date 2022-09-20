@@ -1,0 +1,15 @@
+// Data access policy
+p0 -> y0
+p1 -> y1
+p2 -> y2
+p3 -> y3
+
+x0 -> p0
+x1 -> p1
+x2 -> p2
+x3 -> p3
+
+y0 -> p0
+y1 -> p0, p1
+y2 -> p0, p2
+y3 -> p2, p3
