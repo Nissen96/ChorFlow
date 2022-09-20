@@ -10,7 +10,8 @@ class Procedure(
     charPosition: Int
 ) : ASTNode(lineNumber, charPosition) {
     override fun accept(visitor: Visitor) {
-        visitor.visit(this)
+        visitor.preVisit(this)
         choreography.accept(visitor)
+        visitor.postVisit(this)
     }
 }

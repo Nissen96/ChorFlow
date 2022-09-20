@@ -25,12 +25,17 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
         println("\n/* Choreography */")
     }
 
-    override fun visit(procedure: Procedure) {
-        print("${procedure.id}(${procedure.processParameters.joinToString(", ")}) = ")
+    override fun preVisit(procedure: Procedure) {
+        print("${procedure.id}(${procedure.processParameters.joinToString(", ")}) =$separator")
+        level++
+    }
+
+    override fun postVisit(procedure: Procedure) {
+        level--
     }
 
     override fun preVisit(choreography: Choreography) {
-        printIndented("")
+        printIndented()
     }
 
     override fun postVisit(choreography: Choreography) {
@@ -65,12 +70,17 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
 
     override fun postMidVisit(conditional: Conditional) {
         level--
-        print(" else$separator")
+        if (condensed) {
+            print(" else ")
+        } else {
+            printIndented("else\n")
+        }
         level++
     }
 
     override fun postVisit(conditional: Conditional) {
         level--
+        printIndented()
     }
 
     override fun preVisit(interaction: Interaction) {
@@ -86,7 +96,7 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun visit(selection: Selection) {
-        print("${selection.sourceProcess} -> ${selection.destinationProcess}.${selection.label}")
+        print("${selection.sourceProcess} -> ${selection.destinationProcess}[${selection.label}]")
     }
 
     override fun visit(expression: Expression) {

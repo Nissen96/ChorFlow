@@ -21,7 +21,8 @@ abstract class Visitor {
     open fun preVisit(parenthesizedInstruction: ParenthesizedInstruction) {}
     open fun postVisit(parenthesizedInstruction: ParenthesizedInstruction) {}
 
-    open fun visit(procedure: Procedure) {}
+    open fun preVisit(procedure: Procedure) {}
+    open fun postVisit(procedure: Procedure) {}
 
     open fun visit(procedureCall: ProcedureCall) {}
 
