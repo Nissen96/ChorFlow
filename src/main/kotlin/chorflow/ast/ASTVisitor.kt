@@ -8,7 +8,7 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     override fun visitProgram(ctx: ChorParser.ProgramContext): Program {
         return Program(
             ctx.procedureList().procedure().map { it.accept(this) as Procedure },
-            ctx.choreography()?.accept(this) as Choreography,
+            ctx.choreography().accept(this) as Choreography,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )

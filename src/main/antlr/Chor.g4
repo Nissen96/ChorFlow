@@ -1,6 +1,6 @@
 grammar Chor;
 
-program: procedureList choreography?;
+program: procedureList choreography;
 
 procedureList: (procedure (',' procedure)*)?;
 procedure: ID '(' processList ')' '=' choreography;

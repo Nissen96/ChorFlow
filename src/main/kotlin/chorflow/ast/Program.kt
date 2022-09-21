@@ -5,7 +5,7 @@ import chorflow.visitor.Visitor
 
 class Program(
     val procedures: List<Procedure>,
-    val choreography: Choreography?,
+    val choreography: Choreography,
     lineNumber: Int,
     charPosition: Int
 ) : ASTNode(lineNumber, charPosition) {
@@ -13,7 +13,7 @@ class Program(
         visitor.preVisit(this)
         procedures.forEach({ it.accept(visitor) }, doBetween = { visitor.preMidVisit(this) })
         visitor.postMidVisit(this)
-        choreography?.accept(visitor)
+        choreography.accept(visitor)
         visitor.postVisit(this)
     }
 }
