@@ -100,9 +100,16 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     }
 
     override fun visitExpression(ctx: ChorParser.ExpressionContext): Expression {
-        // TODO handle expressions
+        // TODO handle expressions - currently just stores the entire expression as a string and extracts all variables
+        val variables = mutableSetOf<String>()
+        if (ctx.ID() != null && ctx.expression() == null) {
+            variables.add(ctx.ID().text)
+        }
+        ctx.expression().forEach { variables.addAll((it.accept(this) as Expression).variables) }
+
         return Expression(
             ctx.text,
+            variables,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )
