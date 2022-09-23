@@ -52,9 +52,15 @@ fun main(args: Array<String>) {
     policy.flows.forEach { println(it.first + " -> " + it.second) }
     println()
 
-    // Get flow induced by choreography
-    val flowMapper = FlowMapper()
-    program.accept(TypeChecker(flowMapper, policy))
+    // Type check the choreography based on the provided flow mapping function and flow policy
+    val flowMapper = FlowMapper()  // Hardcoded for now
+    val typeChecker = TypeChecker(program.procedures, flowMapper, policy)
+
+    program.choreography.accept(typeChecker)
+    if (typeChecker.errors.isNotEmpty()) {
+        throw Exception("Flow violations found:\n" + typeChecker.errors.joinToString("\n"))
+    }
+
     println("CHORFLOW:")
-    program.flow.flows.forEach { println(it.first + " -> " + it.second) }
+    typeChecker.flow.flows.forEach { println(it.first + " -> " + it.second) }
 }

@@ -1,15 +1,23 @@
 package chorflow.flow
 
 import chorflow.ast.*
+import chorflow.visitor.SubstitutionVisitor
 import chorflow.visitor.Visitor
 
-class TypeChecker(val flowMapper: FlowMapper, val policy: Flow): Visitor() {
-    var errors = mutableListOf<String>()
-    lateinit var root: Program
+class TypeChecker(
+    private val procedures: List<Procedure>,
+    private val flowMapper: FlowMapper,
+    private val policy: Flow
+): Visitor() {
+    val errors = mutableListOf<String>()
+    var flow = Flow()
 
-    fun checkPolicy(astNode: ASTNode) {
+    // Store each argument list passed to each procedure to avoid re-checking on recursion
+    private val procedureCalls = procedures.associate { it.id to mutableSetOf<List<String>>() }
+
+    private fun checkPolicy(astNode: ASTNode) {
         // Map event to flows
-        val flow = when (astNode) {
+        val flows = when (astNode) {
             is Assignment -> flowMapper.flows(astNode)
             is Conditional -> flowMapper.flows(astNode)
             is Selection -> flowMapper.flows(astNode)
@@ -18,18 +26,14 @@ class TypeChecker(val flowMapper: FlowMapper, val policy: Flow): Visitor() {
         }
 
         // Add flow to total program flow
-        root.flow += flow
+        flow += flows
 
         // Add any flow violations
-        flow.flows.forEach {
+        flows.flows.forEach {
             if (it !in policy) {
                 errors.add("${it.first} -> ${it.second} (line ${astNode.lineNumber}, index ${astNode.charPosition})")
             }
         }
-    }
-
-    override fun preVisit(program: Program) {
-        root = program
     }
 
     override fun visit(assignment: Assignment) {
@@ -48,9 +52,23 @@ class TypeChecker(val flowMapper: FlowMapper, val policy: Flow): Visitor() {
         checkPolicy(interaction)
     }
 
-    override fun postVisit(program: Program) {
-        if (errors.isNotEmpty()) {
-            throw Exception("Flow violations found:\n" + errors.joinToString("\n"))
+    override fun preVisit(procedureCall: ProcedureCall) {
+        // Find matching procedure
+        val procedure = procedures.find { it.id == procedureCall.id }!!
+        if (procedureCall.processArguments.size != procedure.processParameters.size) {
+            throw UnsupportedOperationException("Number of arguments do not match expected number of parameters")
+        }
+
+        val parameters = procedure.processParameters.map { it.id }
+        val arguments = procedureCall.processArguments.map { it.id }
+
+        // Substitute all process parameters with passed process arguments
+        procedure.accept(SubstitutionVisitor(parameters, arguments))
+
+        // Type check resulting procedure recursively - if not done previously for the same argument list!
+        if (arguments !in procedureCalls[procedure.id]!!) {
+            procedureCalls[procedure.id]!!.add(arguments)
+            procedure.accept(this)
         }
     }
 }
