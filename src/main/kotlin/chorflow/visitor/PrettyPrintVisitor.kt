@@ -17,7 +17,7 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun preMidVisit(program: Program) {
-        println(",")
+        println(", ")
     }
 
     override fun postMidVisit(program: Program) {
@@ -30,7 +30,15 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun preVisit(procedure: Procedure) {
-        print("${procedure.id}(${procedure.processParameters.joinToString(", ")}) =$separator")
+        print("${procedure.id}(")
+    }
+
+    override fun preMidVisit(procedure: Procedure) {
+        print(", ")
+    }
+
+    override fun postMidVisit(procedure: Procedure) {
+        print(") =$separator")
         level++
     }
 
@@ -60,14 +68,18 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun visit(assignment: Assignment) {
-        print("${assignment.process}.${assignment.variable} := ")
+        print(".${assignment.variable} := ")
     }
 
     override fun preVisit(conditional: Conditional) {
-        print("if ${conditional.process}.")
+        print("if ")
     }
 
     override fun preMidVisit(conditional: Conditional) {
+        print(".")
+    }
+
+    override fun midMidVisit(conditional: Conditional) {
         print(" then$separator")
         level++
     }
@@ -87,20 +99,40 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
         printIndented()
     }
 
-    override fun preVisit(interaction: Interaction) {
-        print("${interaction.sourceProcess}.")
+    override fun preMidVisit(interaction: Interaction) {
+        print(".")
     }
+    override fun postMidVisit(interaction: Interaction) {
+        print(" -> ")
+    }
+
     override fun postVisit(interaction: Interaction) {
-        print(" -> ${interaction.destinationProcess}.${interaction.destinationVariable}")
+        print(".${interaction.destinationVariable}")
     }
 
 
-    override fun visit(procedureCall: ProcedureCall) {
-        print("${procedureCall.id}(${procedureCall.processArguments.joinToString(", ")})")
+    override fun preVisit(procedureCall: ProcedureCall) {
+        print("${procedureCall.id}(")
     }
 
-    override fun visit(selection: Selection) {
-        print("${selection.sourceProcess} -> ${selection.destinationProcess}[${selection.label}]")
+    override fun midVisit(procedureCall: ProcedureCall) {
+        print(", ")
+    }
+
+    override fun postVisit(procedureCall: ProcedureCall) {
+        print(")")
+    }
+
+    override fun visit(process: Process) {
+        print(process.id)
+    }
+
+    override fun midVisit(selection: Selection) {
+        print(" -> ")
+    }
+
+    override fun postVisit(selection: Selection) {
+        print("[${selection.label}]")
     }
 
     override fun visit(expression: Expression) {

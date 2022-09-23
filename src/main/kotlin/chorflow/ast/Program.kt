@@ -1,8 +1,8 @@
 package chorflow.ast
 
 import chorflow.flow.Flow
-import chorflow.util.forEach
 import chorflow.visitor.Visitor
+import chorflow.util.forEach
 
 class Program(
     val procedures: List<Procedure>,
@@ -13,8 +13,7 @@ class Program(
     var flow: Flow = Flow()
     override fun accept(visitor: Visitor) {
         visitor.preVisit(this)
-        // TODO procedures should be visited separately, allowing process substitution
-        //procedures.forEach({ it.accept(visitor) }, doBetween = { visitor.preMidVisit(this) })
+        procedures.forEach({ it.accept(visitor) }, doBetween = { visitor.preMidVisit(this) })
         visitor.postMidVisit(this)
         choreography.accept(visitor)
         visitor.postVisit(this)

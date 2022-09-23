@@ -36,7 +36,7 @@ class TypeChecker(val flowMapper: FlowMapper, val policy: Flow): Visitor() {
         checkPolicy(assignment)
     }
 
-    override fun visit(selection: Selection) {
+    override fun midVisit(selection: Selection) {
         checkPolicy(selection)
     }
 
@@ -44,7 +44,7 @@ class TypeChecker(val flowMapper: FlowMapper, val policy: Flow): Visitor() {
         checkPolicy(conditional)
     }
 
-    override fun preVisit(interaction: Interaction) {
+    override fun preMidVisit(interaction: Interaction) {
         checkPolicy(interaction)
     }
 

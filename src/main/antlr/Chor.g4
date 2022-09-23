@@ -17,12 +17,13 @@ instruction: interaction
            | '(' instruction ')'
            ;
 
-interaction: ID '.' expression '->' ID '.' ID;
-assignment: ID '.' ID ':=' expression;
-selection: ID '->' ID '[' ID ']';
-conditional: 'if' ID '.' expression 'then' choreography 'else' choreography;
+interaction: process '.' expression '->' process '.' ID;
+assignment: process '.' ID ':=' expression;
+selection: process '->' process '[' ID ']';
+conditional: 'if' process '.' expression 'then' choreography 'else' choreography;
 procedureCall: ID '(' processList ')';
-processList: ID ',' ID (',' ID)*;  // At least two processes
+processList: process ',' process (',' process)*;  // At least two processes
+process: ID;
 
 expression: op=('-' | '!') expression
           | expression op=('**' | '*' | '/' | '%' | '+' | '-') expression

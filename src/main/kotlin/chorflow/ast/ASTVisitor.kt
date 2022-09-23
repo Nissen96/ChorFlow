@@ -17,7 +17,7 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     override fun visitProcedure(ctx: ChorParser.ProcedureContext): Procedure {
         return Procedure(
             ctx.ID().text,
-            ctx.processList().ID().map { it.text },
+            ctx.processList().process().map { it.accept(this) as Process },
             ctx.choreography().accept(this) as Choreography,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
@@ -48,10 +48,18 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
         } as Instruction
     }
 
+    override fun visitProcess(ctx: ChorParser.ProcessContext): Process {
+        return Process(
+            ctx.ID().text,
+            lineNumber = ctx.start.line,
+            charPosition = ctx.start.charPositionInLine
+        )
+    }
+
     override fun visitAssignment(ctx: ChorParser.AssignmentContext): Assignment {
         return Assignment(
-            ctx.ID(0).text,
-            ctx.ID(1).text,
+            ctx.process().accept(this) as Process,
+            ctx.ID().text,
             ctx.expression().accept(this) as Expression,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
@@ -60,7 +68,7 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
 
     override fun visitConditional(ctx: ChorParser.ConditionalContext): Conditional {
         return Conditional(
-            ctx.ID().text,
+            ctx.process().accept(this) as Process,
             ctx.expression().accept(this) as Expression,
             ctx.choreography(0).accept(this) as Choreography,
             ctx.choreography(1).accept(this) as Choreography,
@@ -71,10 +79,10 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
 
     override fun visitInteraction(ctx: ChorParser.InteractionContext): Interaction {
         return Interaction(
-            ctx.ID(0).text,
+            ctx.process(0).accept(this) as Process,
             ctx.expression().accept(this) as Expression,
-            ctx.ID(1).text,
-            ctx.ID(2).text,
+            ctx.process(1).accept(this) as Process,
+            ctx.ID().text,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )
@@ -82,9 +90,9 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
 
     override fun visitSelection(ctx: ChorParser.SelectionContext): Selection {
         return Selection(
-            ctx.ID(0).text,
-            ctx.ID(1).text,
-            ctx.ID(2).text,
+            ctx.process(0).accept(this) as Process,
+            ctx.process(1).accept(this) as Process,
+            ctx.ID().text,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )
@@ -93,7 +101,7 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     override fun visitProcedureCall(ctx: ChorParser.ProcedureCallContext): ProcedureCall {
         return ProcedureCall(
             ctx.ID().text,
-            ctx.processList().ID().map { it.text },
+            ctx.processList().process().map { it.accept(this) as Process },
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )
