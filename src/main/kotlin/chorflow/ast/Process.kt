@@ -1,4 +1,4 @@
-package chorflow.ast;
+package chorflow.ast
 
 import chorflow.visitor.Visitor
 
