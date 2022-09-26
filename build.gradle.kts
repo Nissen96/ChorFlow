@@ -15,7 +15,22 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+
+    // ANTLR: Parser generator, generates recognizer for a language based on a grammar
     antlr("org.antlr:antlr4:4.11.1")
+
+    // Builtin graphviz support to visualize flow graphs
+    implementation("guru.nidi:graphviz-kotlin:0.18.1")
+
+    // Logging - dependency for graphviz-kotlin
+    implementation("org.apache.logging.log4j:log4j:2.19.0")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
+
+    // Bindings for V8, used to execute graphviz on the Javascript V8 engine
+    //implementation("com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0")
+    implementation("com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0")
+    //implementation("com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0")
+    //implementation("com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0")
 }
 
 tasks.generateGrammarSource {

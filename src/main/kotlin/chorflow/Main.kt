@@ -2,10 +2,7 @@ package chorflow
 
 import chorflow.ast.ASTVisitor
 import chorflow.ast.Program
-import chorflow.flow.Flow
-import chorflow.flow.FlowMapper
-import chorflow.flow.MappingSpec
-import chorflow.flow.TypeChecker
+import chorflow.flow.*
 import chorflow.grammar.ChorLexer
 import chorflow.grammar.ChorParser
 import chorflow.visitor.PrettyPrintVisitor
@@ -26,7 +23,7 @@ fun parseFlowFile(filename: String): Flow {
 
     File(filename).forEachLine { line ->
         if (line.isNotBlank() && !line.startsWith("#")) {
-            val (src, dests) = line.replace(" ", "").replace("\t", "").split("->")
+            val (src, dests) = line.filter { !it.isWhitespace() }.split("->")
             if (dests.isNotBlank()) {
                 dests.split(",").forEach { dest ->
                     flows.add(src to dest)
@@ -81,32 +78,23 @@ fun main(args: Array<String>) {
     val program = parseChoreographyFile(args[0])
 
     // Pretty print
-    program.accept(PrettyPrintVisitor(indentation = 4, condensed = false))
-    println()
     program.accept(PrettyPrintVisitor(indentation = 4, condensed = true))
     println()
 
-    // Read and print flow policy
-    val policy = parseFlowFile(args[1])
-    println(buildString {
-        appendLine("POLICY")
-        policy.flows.forEach { appendLine("${it.first} -> ${it.second}") }
-    })
-
     // Type check the choreography based on the provided flow mapping function and flow policy
+    val policy = parseFlowFile(args[1])
     val mappingSpec = parseMappingFile(args[2])
     val flowMapper = FlowMapper(mappingSpec)  // Hardcoded for now
     val typeChecker = TypeChecker(program.procedures, flowMapper, policy)
     program.choreography.accept(typeChecker)
 
-    println(buildString {
-        appendLine("CHORFLOW")
-        typeChecker.flow.flows.forEach { appendLine("${it.first} -> ${it.second}") }
-    })
+    // Visualize flow and save it
+    val flowGraph = FlowGraph(typeChecker.flow, policy)
+    flowGraph.display()
+    flowGraph.save("flow.png")
 
+    // Throw exception if any flow violation was found, printing each
     if (typeChecker.errors.isNotEmpty()) {
-        // Need a delay here to avoid interleaving the stderr output with the previous stdout before it's done printing
-        Thread.sleep(100)
         throw Exception("Flow violations found:\n${typeChecker.errors.joinToString("\n")}")
     }
 }
