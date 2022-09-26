@@ -1,0 +1,3 @@
+lflow(p.x := e) = e -> p, p -> x
+lflow(p.e) = e -> p
+lflow(p.e -> q.x) = e -> p, q -> x

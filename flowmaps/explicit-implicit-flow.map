@@ -1,0 +1,4 @@
+lflow(p.x := e) = e -> x, p -> x
+lflow(p.e) = e -> p
+lflow(p -> q[L]) = p <-> q
+lflow(p.e -> q.x) = p <-> q, q -> x, e -> x
