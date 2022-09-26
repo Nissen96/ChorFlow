@@ -1,4 +1,4 @@
-// Explicit data flow policy
+# Explicit data flow policy
 name    -> user
 user    -> id, class
 id      -> report

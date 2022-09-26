@@ -1,4 +1,4 @@
-// Explicit + implicit flow policy
+# Explicit + implicit flow policy
 u       -> info, pwd, s, rp, ip
 rp      -> u, ip, s, user, report
 ip      -> u, rp, id, pwd
