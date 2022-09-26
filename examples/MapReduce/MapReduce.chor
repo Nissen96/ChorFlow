@@ -9,25 +9,18 @@ The following is an example with four processes, running the algorithm on four v
 */
 
 // Send second half of work to p2
-p0.x2 -> p2.x2;
-p0.x3 -> p2.x3;
+p0.(3, 4) -> p2.x2;
 
-// Process two first values at p0 and p1
-p0.x1 -> p1.x1;
+// Process two first values at p0 and p1, collect at p0, and reduce
+p0.2 -> p1.x1;
 p0.y0 := map(x0);
-p1.y1 := map(x1);
-
-// Collect and reduce the results at p0
-p1.y1 -> p0.y1;
+p1.map(x1) -> p0.y1;
 p0.y0 := reduce(y0, y1);
 
-// Process two last halves at p2 and p3
-p2.x3 -> p3.x3;
+// Similar processing at x2 and x3
+p2.4 -> p3.x3;
 p2.y2 := map(x2);
-p3.y3 := map(x3);
-
-// Collect and reduce the results at p2
-p3.y3 -> p2.y3;
+p3.map(x3) -> p2.y3;
 p2.y2 := reduce(y2, y3);
 
 // Collect and reduce final results at p0

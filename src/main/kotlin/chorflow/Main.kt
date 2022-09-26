@@ -50,9 +50,9 @@ fun parseMappingFile(filename: String): MappingSpec {
             val mappingList = with (eventType) {
                 when {
                     contains("p.x:=e") -> mappingSpec.assignment
-                    contains("p.e") -> mappingSpec.conditional
                     contains("p->q[L]") -> mappingSpec.selection
                     contains("p.e->q.x") -> mappingSpec.interaction
+                    contains("p.e") -> mappingSpec.conditional
                     else -> throw IllegalArgumentException("Invalid flow mapping function")
                 }
             }
@@ -88,20 +88,25 @@ fun main(args: Array<String>) {
 
     // Read and print flow policy
     val policy = parseFlowFile(args[1])
-    println("POLICY:")
-    policy.flows.forEach { println(it.first + " -> " + it.second) }
-    println()
+    println(buildString {
+        appendLine("POLICY")
+        policy.flows.forEach { appendLine("${it.first} -> ${it.second}") }
+    })
 
     // Type check the choreography based on the provided flow mapping function and flow policy
     val mappingSpec = parseMappingFile(args[2])
     val flowMapper = FlowMapper(mappingSpec)  // Hardcoded for now
     val typeChecker = TypeChecker(program.procedures, flowMapper, policy)
-
     program.choreography.accept(typeChecker)
-    if (typeChecker.errors.isNotEmpty()) {
-        throw Exception("Flow violations found:\n" + typeChecker.errors.joinToString("\n"))
-    }
 
-    println("CHORFLOW:")
-    typeChecker.flow.flows.forEach { println(it.first + " -> " + it.second) }
+    println(buildString {
+        appendLine("CHORFLOW")
+        typeChecker.flow.flows.forEach { appendLine("${it.first} -> ${it.second}") }
+    })
+
+    if (typeChecker.errors.isNotEmpty()) {
+        // Need a delay here to avoid interleaving the stderr output with the previous stdout before it's done printing
+        Thread.sleep(100)
+        throw Exception("Flow violations found:\n${typeChecker.errors.joinToString("\n")}")
+    }
 }

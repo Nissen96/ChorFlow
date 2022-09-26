@@ -10,9 +10,6 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         val p = assignment.process.id
         val x = assignment.variable
         val e = assignment.expression.variables
-        println(p)
-        println(x)
-        println(e)
 
         return Flow(
             mappingSpec.assignment.map { f ->
@@ -51,7 +48,7 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         val x = interaction.destinationVariable
 
         return Flow(
-            mappingSpec.assignment.map { f ->
+            mappingSpec.interaction.map { f ->
                 when (f) {
                     Pair("p", "e") -> e.map { p to it }
                     Pair("p", "q") -> listOf(p to q)
