@@ -10,11 +10,12 @@ abstract class Visitor {
 
     open fun preVisit(conditional: Conditional) {}
     open fun preMidVisit(conditional: Conditional) {}
-    open fun midMidVisit(conditional: Conditional) {}
     open fun postMidVisit(conditional: Conditional) {}
     open fun postVisit(conditional: Conditional) {}
 
     open fun visit(expression: Expression) {}
+
+    open fun visit(guard: Guard) {}
 
     open fun preMidVisit(interaction: Interaction) {}
     open fun postMidVisit(interaction: Interaction) {}

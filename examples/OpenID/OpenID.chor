@@ -6,7 +6,7 @@ SendData(p, q) =
         SendData(p, q); 0
     else
         p."end" -> q.info; 0
-; 0
+    ; 0
 
 /* Choreography */
 u.name -> rp.user;

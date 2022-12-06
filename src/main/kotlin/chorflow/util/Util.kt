@@ -7,3 +7,5 @@ inline fun <T> Iterable<T>.forEach(action: (T) -> Unit, doBetween: () -> Unit) {
         action(t)
     }
 }
+
+fun Boolean.toInt() = if (this) 1 else 0

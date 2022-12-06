@@ -1,74 +1,92 @@
 package chorflow.flow
 
 import chorflow.ast.*
-import chorflow.visitor.SubstitutionVisitor
 import chorflow.visitor.Visitor
 
 class TypeChecker(
-    private val procedures: List<Procedure>,
     private val flowMapper: FlowMapper,
-    private val policy: Flow
+    private val localPolicies: Map<String, Flow>
 ): Visitor() {
-    val errors = mutableListOf<String>()
-    var flow = Flow()
+    val policyErrors = mutableListOf<String>()
+    val localPolicyErrors = localPolicies.keys.associateWith { mutableListOf<String>() }
+    private lateinit var errors: MutableList<String>
+    private lateinit var procedures: List<Procedure>
 
-    // Store each argument list passed to each procedure to avoid re-checking on recursion
-    private val procedureCalls = procedures.associate { it.id to mutableSetOf<List<String>>() }
-
-    private fun checkPolicy(astNode: ASTNode) {
-        // Map event to flows
-        val flows = when (astNode) {
-            is Assignment -> flowMapper.flows(astNode)
-            is Conditional -> flowMapper.flows(astNode)
-            is Selection -> flowMapper.flows(astNode)
-            is Interaction -> flowMapper.flows(astNode)
-            else -> throw IllegalArgumentException("flow mapping function is not defined for this event")
-        }
-
-        // Add flow to total program flow
-        flow += flows
-
-        // Add any flow violations
-        flows.flows.forEach {
-            if (it !in policy) {
-                errors.add("${it.first} -> ${it.second} (line ${astNode.lineNumber}, index ${astNode.charPosition})")
+    private fun checkPolicy(event: Event, policy: Flow): Flow {
+        // Map event to its flows and checkFlow satisfaction
+        val flow = flowMapper.flow(event)
+        if (!flow.isSubflow(policy)) {
+            // Mark each violation
+            event as ASTNode
+            flow.flows.forEach {
+                if (it !in policy) {
+                    errors.add("${it.first} -> ${it.second} (line ${event.lineNumber}, index ${event.charPosition})")
+                }
             }
         }
+        return flow
     }
 
-    override fun visit(assignment: Assignment) {
-        checkPolicy(assignment)
+    fun checkFlow(program: Program, policy: Flow): Pair<Flow, Map<String, Flow>> {
+        procedures = program.procedures
+        val localFlows = procedures.associate { it.id to checkFlow(it) }
+        errors = policyErrors
+        return checkFlow(program.choreography, policy) to localFlows
     }
 
-    override fun midVisit(selection: Selection) {
-        checkPolicy(selection)
+    private fun checkFlow(procedure: Procedure): Flow {
+        // Check local policy satisfaction for procedure body
+        val localPolicy = localPolicies[procedure.id]!!
+        errors = localPolicyErrors[procedure.id]!!
+        return checkFlow(procedure.choreography, localPolicy)
     }
 
-    override fun preVisit(conditional: Conditional) {
-        checkPolicy(conditional)
+    private fun checkFlow(choreography: Choreography, policy: Flow): Flow {
+        var flow = when (choreography.instruction) {
+            is Action -> checkPolicy(choreography.instruction, policy)
+            is Conditional -> checkFlow(choreography.instruction, policy)
+            is ProcedureCall -> checkFlow(choreography.instruction, policy)
+            else -> throw IllegalArgumentException("No typing rules for this instruction")
+        }
+        if (choreography.continuation != null) {
+            flow += checkFlow(choreography.continuation, policy)
+        }
+        return flow
     }
 
-    override fun preMidVisit(interaction: Interaction) {
-        checkPolicy(interaction)
+    private fun checkFlow(conditional: Conditional, policy: Flow): Flow {
+        return checkPolicy(conditional.guard, policy) +
+                checkFlow(conditional.ifChoreography, policy) +
+                checkFlow(conditional.elseChoreography, policy)
     }
 
-    override fun preVisit(procedureCall: ProcedureCall) {
-        // Find matching procedure
+    private fun checkFlow(procedureCall: ProcedureCall, policy: Flow): Flow {
+        // Find matching procedure and validate arguments
         val procedure = procedures.find { it.id == procedureCall.id }!!
         if (procedureCall.processArguments.size != procedure.processParameters.size) {
-            throw UnsupportedOperationException("Number of arguments do not match expected number of parameters")
+            throw UnsupportedOperationException("Number of arguments do not match number of parameters")
         }
 
+        // Generate substitution mapping
         val parameters = procedure.processParameters.map { it.id }
         val arguments = procedureCall.processArguments.map { it.id }
+        val substitutions = parameters.zip(arguments).toMap()
 
-        // Substitute all process parameters with passed process arguments
-        procedure.accept(SubstitutionVisitor(parameters, arguments))
+        // Substitution in local policy
+        val localPolicy = localPolicies[procedure.id]!!
+        val instantiatedLocalPolicy = Flow(localPolicy.flows.map {
+            (substitutions[it.first] ?: it.first) to (substitutions[it.second] ?: it.second)
+        }.toMutableSet())
 
-        // Type check resulting procedure recursively - if not done previously for the same argument list!
-        if (arguments !in procedureCalls[procedure.id]!!) {
-            procedureCalls[procedure.id]!!.add(arguments)
-            procedure.accept(this)
+        // check compatability with global policy
+        if (!instantiatedLocalPolicy.isSubflow(policy)) {
+            instantiatedLocalPolicy.flows.forEach {
+                if (it !in policy) {
+                    errors.add("${it.first} -> ${it.second} (in procedure ${procedureCall.id})")
+                }
+            }
         }
+
+        return instantiatedLocalPolicy
     }
 }

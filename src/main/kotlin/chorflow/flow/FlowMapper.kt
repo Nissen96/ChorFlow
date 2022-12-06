@@ -1,12 +1,19 @@
 package chorflow.flow
 
-import chorflow.ast.Assignment
-import chorflow.ast.Conditional
-import chorflow.ast.Interaction
-import chorflow.ast.Selection
+import chorflow.ast.*
 
 class FlowMapper(private val mappingSpec: MappingSpec) {
-    fun flows(assignment: Assignment): Flow {
+    fun flow(event: Event): Flow {
+        return when (event) {
+            is Assignment -> flow(event)
+            is Guard -> flow(event)
+            is Selection -> flow(event)
+            is Interaction -> flow(event)
+            else -> throw IllegalArgumentException("flow mapping function is not defined for this event type")
+        }
+    }
+
+    private fun flow(assignment: Assignment): Flow {
         val p = assignment.process.id
         val x = assignment.variable
         val e = assignment.expression.variables
@@ -22,13 +29,13 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
                     Pair("e", "x") -> e.map { it to x }
                     else -> emptyList()
                 }
-            }.flatten().toSet()
+            }.flatten().toMutableSet()
         )
     }
 
-    fun flows(conditional: Conditional): Flow {
-        val p = conditional.process.id
-        val e = conditional.expression.variables
+    private fun flow(guard: Guard): Flow {
+        val p = guard.process.id
+        val e = guard.expression.variables
 
         return Flow(
             mappingSpec.conditional.map { f ->
@@ -37,11 +44,11 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
                     Pair("e", "p") -> e.map { it to p }
                     else -> emptyList()
                 }
-            }.flatten().toSet()
+            }.flatten().toMutableSet()
         )
     }
 
-    fun flows(interaction: Interaction): Flow {
+    private fun flow(interaction: Interaction): Flow {
         val p = interaction.sourceProcess.id
         val e = interaction.expression.variables
         val q = interaction.destinationProcess.id
@@ -64,11 +71,11 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
                     Pair("x", "e") -> e.map { x to it }
                     else -> emptyList()
                 }
-            }.flatten().toSet()
+            }.flatten().toMutableSet()
         )
     }
 
-    fun flows(selection: Selection): Flow {
+    private fun flow(selection: Selection): Flow {
         val p = selection.sourceProcess.id
         val q = selection.destinationProcess.id
 
@@ -79,7 +86,7 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
                     Pair("q", "p") -> q to p
                     else -> null
                 }
-            }.toSet()
+            }.toMutableSet()
         )
     }
 }

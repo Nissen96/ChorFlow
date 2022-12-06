@@ -76,10 +76,6 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun preMidVisit(conditional: Conditional) {
-        print(".")
-    }
-
-    override fun midMidVisit(conditional: Conditional) {
         print(" then$separator")
         level++
     }
@@ -97,6 +93,10 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     override fun postVisit(conditional: Conditional) {
         level--
         printIndented()
+    }
+
+    override fun visit(guard: Guard) {
+        print(".")
     }
 
     override fun preMidVisit(interaction: Interaction) {

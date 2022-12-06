@@ -1,8 +1,8 @@
 package chorflow.flow
 
+import chorflow.util.toInt
 import guru.nidi.graphviz.*
 import guru.nidi.graphviz.attribute.*
-import guru.nidi.graphviz.attribute.GraphAttr.SplineMode
 import guru.nidi.graphviz.engine.Format
 import guru.nidi.graphviz.model.MutableGraph
 import java.io.File
@@ -14,13 +14,17 @@ class FlowGraph(flow: Flow, private val policy: Flow?) {
     init {
         val (okFlow, badFlow) = flow.flows.partition { f -> policy?.let { f in it.flows } ?: true }
         val policyFlow = policy?.flows?.minus(okFlow.toSet())
+        val nFlowTypes = okFlow.isNotEmpty().toInt() + badFlow.isNotEmpty().toInt() + (policyFlow?.isNotEmpty()?.toInt() ?: 0)
 
         graph = graph(directed = true) {
-            graph[Rank.dir(Rank.RankDir.LEFT_TO_RIGHT), GraphAttr.CONCENTRATE]
+            if (nFlowTypes <= 1)
+                graph[Rank.dir(Rank.RankDir.LEFT_TO_RIGHT), GraphAttr.CONCENTRATE]
+            else
+                graph[Rank.dir(Rank.RankDir.LEFT_TO_RIGHT)]
 
-            policyFlow?.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.DASHED] }
-            okFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE] }
-            badFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Color.RED] }
+            badFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.SOLID, Color.RED] }
+            okFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.SOLID, Color.BLACK] }
+            policyFlow?.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.DASHED, Color.BLACK] }
         }
     }
 

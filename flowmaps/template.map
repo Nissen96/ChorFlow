@@ -1,11 +1,11 @@
 # Assignment
-lflow(p.x := e) = p <-> x, p <-> e, x <-> e
+flow(p.x := e) = p <-> x, p <-> e, x <-> e
 
 # Conditional
-lflow(p.e) = p <-> e
+flow(p.e) = p <-> e
 
 # Selection
-lflow(p -> q[L]) = p <-> q
+flow(p -> q[L]) = p <-> q
 
 # Interaction
-lflow(p.e -> q.x) = p <-> e, p <-> q, p <-> x, e <-> q, e <-> x, q <-> x
+flow(p.e -> q.x) = p <-> e, p <-> q, p <-> x, e <-> q, e <-> x, q <-> x

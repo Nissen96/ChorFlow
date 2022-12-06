@@ -68,8 +68,12 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
 
     override fun visitConditional(ctx: ChorParser.ConditionalContext): Conditional {
         return Conditional(
-            ctx.process().accept(this) as Process,
-            ctx.expression().accept(this) as Expression,
+            Guard(
+                ctx.process().accept(this) as Process,
+                ctx.expression().accept(this) as Expression,
+                lineNumber = ctx.start.line,
+                charPosition = ctx.start.charPositionInLine
+            ),
             ctx.choreography(0).accept(this) as Choreography,
             ctx.choreography(1).accept(this) as Choreography,
             lineNumber = ctx.start.line,

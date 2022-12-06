@@ -8,7 +8,7 @@ class Selection(
     val label: String,
     lineNumber: Int,
     charPosition: Int
-) : Instruction(lineNumber, charPosition) {
+) : Action(lineNumber, charPosition) {
     override fun accept(visitor: Visitor) {
         sourceProcess.accept(visitor)
         visitor.midVisit(this)

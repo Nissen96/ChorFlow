@@ -1,19 +1,19 @@
 package chorflow.flow
 
-class Flow(val flows: Set<Pair<String, String>> = emptySet()) {
+class Flow(val flows: MutableSet<Pair<String, String>> = mutableSetOf()) {
     operator fun plus(flow: Flow): Flow {
-        return Flow(flows + flow.flows)
-    }
-
-    operator fun plus(flow: Set<Pair<String, String>>): Flow {
-        return Flow(flows + flow)
-    }
-
-    operator fun plus(flow: Pair<String, String>): Flow {
-        return Flow(flows + setOf(flow))
+        return Flow((flows + flow.flows).toMutableSet())
     }
 
     operator fun contains(flow: Pair<String, String>): Boolean {
         return flow in flows
+    }
+
+    fun add(flow: Pair<String, String>) {
+        flows.add(flow)
+    }
+
+    fun isSubflow(other: Flow): Boolean {
+        return flows.all { it in other.flows }
     }
 }

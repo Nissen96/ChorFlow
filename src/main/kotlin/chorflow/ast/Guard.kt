@@ -2,13 +2,12 @@ package chorflow.ast
 
 import chorflow.visitor.Visitor
 
-class Assignment(
+class Guard(
     val process: Process,
-    val variable: String,
     val expression: Expression,
     lineNumber: Int,
     charPosition: Int
-) : Action(lineNumber, charPosition) {
+): Instruction(lineNumber, charPosition), Event {
     override fun accept(visitor: Visitor) {
         process.accept(visitor)
         visitor.visit(this)

@@ -1,7 +1,15 @@
 # Explicit data flow policy
-name    -> user
+
+# Global policy
+name    -> user, id
 user    -> id, class
 id      -> report
 class   -> data
 my_pwd  -> pwd
 data    -> data, info
+
+
+# Local policy/policies
+SendData:
+data -> info
+data -> data
