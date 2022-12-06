@@ -8,13 +8,13 @@ import guru.nidi.graphviz.model.MutableGraph
 import java.io.File
 import javax.swing.*
 
-class FlowGraph(flow: Flow, private val policy: Flow?) {
+class FlowGraph(flow: Flow = Flow(), private val policy: Flow = Flow()) {
     var graph: MutableGraph
 
     init {
-        val (okFlow, badFlow) = flow.flows.partition { f -> policy?.let { f in it.flows } ?: true }
-        val policyFlow = policy?.flows?.minus(okFlow.toSet())
-        val nFlowTypes = okFlow.isNotEmpty().toInt() + badFlow.isNotEmpty().toInt() + (policyFlow?.isNotEmpty()?.toInt() ?: 0)
+        val (okFlow, badFlow) = flow.flows.partition { f -> policy.let { f in it.flows } }
+        val policyFlow = policy.flows.minus(okFlow.toSet())
+        val nFlowTypes = okFlow.isNotEmpty().toInt() + badFlow.isNotEmpty().toInt() + policyFlow.isNotEmpty().toInt()
 
         graph = graph(directed = true) {
             if (nFlowTypes <= 1)
@@ -24,7 +24,7 @@ class FlowGraph(flow: Flow, private val policy: Flow?) {
 
             badFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.SOLID, Color.RED] }
             okFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.SOLID, Color.BLACK] }
-            policyFlow?.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.DASHED, Color.BLACK] }
+            policyFlow.forEach { (src, dst) -> (src - dst)[Arrow.VEE, Style.DASHED, Color.BLACK] }
         }
     }
 
