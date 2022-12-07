@@ -1,4 +1,4 @@
-flow(p.x := e) = e -> x, p -> x
 flow(p.e) = e -> p
+flow(p.x := e) = e -> x, p -> x
 flow(p -> q[L]) = p <-> q
 flow(p.e -> q.x) = p <-> q, q -> x, e -> x

@@ -1,8 +1,8 @@
-# Assignment
-flow(p.x := e) = p <-> x, p <-> e, x <-> e
-
 # Conditional
 flow(p.e) = p <-> e
+
+# Assignment
+flow(p.x := e) = p <-> x, p <-> e, x <-> e
 
 # Selection
 flow(p -> q[L]) = p <-> q

@@ -8,12 +8,17 @@ import guru.nidi.graphviz.model.MutableGraph
 import java.io.File
 import javax.swing.*
 
-class FlowGraph(flow: Flow = Flow(), private val policy: Flow = Flow()) {
+class FlowGraph(flow: Flow = Flow(), private val policy: Flow? = null) {
     var graph: MutableGraph
 
     init {
-        val (okFlow, badFlow) = flow.flows.partition { f -> policy.let { f in it.flows } }
-        val policyFlow = policy.flows.minus(okFlow.toSet())
+        // If policy is not specified, all flow is ok
+        val (okFlow, badFlow) = if (policy == null) {
+            flow.flows to emptyList()
+        } else {
+            flow.flows.partition { f -> policy.let { f in it.flows } }
+        }
+        val policyFlow = policy?.flows?.minus(okFlow.toSet()) ?: emptyList()
         val nFlowTypes = okFlow.isNotEmpty().toInt() + badFlow.isNotEmpty().toInt() + policyFlow.isNotEmpty().toInt()
 
         graph = graph(directed = true) {
@@ -40,7 +45,7 @@ class FlowGraph(flow: Flow = Flow(), private val policy: Flow = Flow()) {
         }
     }
 
-    fun save(filename: String) {
-        graph.toGraphviz().height(500).render(Format.PNG).toFile(File(filename))
+    fun save(file: File) {
+        graph.toGraphviz().height(500).render(Format.PNG).toFile(file)
     }
 }

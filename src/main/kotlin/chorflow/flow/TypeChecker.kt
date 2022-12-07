@@ -36,8 +36,8 @@ class TypeChecker(
 
     private fun checkFlow(procedure: Procedure): Flow {
         // Check local policy satisfaction for procedure body
-        val localPolicy = localPolicies[procedure.id]!!
-        errors = localPolicyErrors[procedure.id]!!
+        val localPolicy = localPolicies[procedure.id] ?: Flow()
+        errors = localPolicyErrors[procedure.id] ?: mutableListOf()
         return checkFlow(procedure.choreography, localPolicy)
     }
 
@@ -73,7 +73,7 @@ class TypeChecker(
         val substitutions = parameters.zip(arguments).toMap()
 
         // Substitution in local policy
-        val localPolicy = localPolicies[procedure.id]!!
+        val localPolicy = localPolicies[procedure.id] ?: Flow()
         val instantiatedLocalPolicy = Flow(localPolicy.flows.map {
             (substitutions[it.first] ?: it.first) to (substitutions[it.second] ?: it.second)
         }.toMutableSet())

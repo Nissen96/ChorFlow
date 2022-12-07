@@ -1,3 +1,3 @@
-flow(p.x := e) = e -> p, p -> x
 flow(p.e) = e -> p
+flow(p.x := e) = e -> p, p -> x
 flow(p.e -> q.x) = e -> p, q -> x

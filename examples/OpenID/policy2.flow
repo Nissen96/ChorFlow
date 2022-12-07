@@ -7,14 +7,14 @@ name    -> user
 user    -> id, class
 id      -> ip, report
 class   -> data
-my_pwd  -> pwd
-report  ->
 pwd     -> ip
 data    -> data, s, info
+my_pwd  -> pwd
 info    ->
+report  ->
 
 SendData:
-p -> data, q, info
-q ->
-data -> q, info, data
+p -> data, q
+q -> p, info
+data -> p, info, data
 info ->

@@ -1,10 +1,12 @@
 /* Procedures */
 SendData(p, q) =
     if p.data != 0 then
+        p -> q[continue];
         p.data -> q.info;
         p.data := next(data);
         SendData(p, q); 0
     else
+        p -> q[end];
         p."end" -> q.info; 0
     ; 0
 
