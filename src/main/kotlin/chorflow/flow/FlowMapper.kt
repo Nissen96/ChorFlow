@@ -21,12 +21,12 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         return Flow(
             mappingSpec.assignment.map { f ->
                 when (f) {
-                    Pair("p", "x") -> listOf(p to x)
-                    Pair("x", "p") -> listOf(x to p)
-                    Pair("p", "e") -> e.map { p to it }
-                    Pair("e", "p") -> e.map { it to p }
-                    Pair("x", "e") -> e.map { x to it }
-                    Pair("e", "x") -> e.map { it to x }
+                    Pair("p", "x") -> listOf(p to "$p.$x")
+                    Pair("x", "p") -> listOf("$p.$x" to p)
+                    Pair("p", "e") -> e.map { p to "$p.$it" }
+                    Pair("e", "p") -> e.map { "$p.$it" to p }
+                    Pair("x", "e") -> e.map { "$p.$x" to "$p.$it" }
+                    Pair("e", "x") -> e.map { "$p.$it" to "$p.$x" }
                     else -> emptyList()
                 }
             }.flatten().toMutableSet()
@@ -40,8 +40,8 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         return Flow(
             mappingSpec.conditional.map { f ->
                 when (f) {
-                    Pair("p", "e") -> e.map { p to it }
-                    Pair("e", "p") -> e.map { it to p }
+                    Pair("p", "e") -> e.map { p to "$p.$it" }
+                    Pair("e", "p") -> e.map { "$p.$it" to p }
                     else -> emptyList()
                 }
             }.flatten().toMutableSet()
@@ -57,18 +57,18 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         return Flow(
             mappingSpec.interaction.map { f ->
                 when (f) {
-                    Pair("p", "e") -> e.map { p to it }
+                    Pair("p", "e") -> e.map { p to "$p.$it" }
                     Pair("p", "q") -> listOf(p to q)
-                    Pair("p", "x") -> listOf(p to x)
-                    Pair("e", "p") -> e.map { it to p }
-                    Pair("e", "q") -> e.map { it to q }
-                    Pair("e", "x") -> e.map { it to x }
+                    Pair("p", "x") -> listOf(p to "$q.$x")
+                    Pair("e", "p") -> e.map { "$p.$it" to p }
+                    Pair("e", "q") -> e.map { "$p.$it" to q }
+                    Pair("e", "x") -> e.map { "$p.$it" to "$q.$x" }
                     Pair("q", "p") -> listOf(q to p)
-                    Pair("q", "e") -> e.map { q to it }
-                    Pair("q", "x") -> listOf(q to x)
-                    Pair("x", "p") -> listOf(x to p)
-                    Pair("x", "q") -> listOf(x to q)
-                    Pair("x", "e") -> e.map { x to it }
+                    Pair("q", "e") -> e.map { q to "$p.$it" }
+                    Pair("q", "x") -> listOf(q to "$q.$x")
+                    Pair("x", "p") -> listOf("$q.$x" to p)
+                    Pair("x", "q") -> listOf("$q.$x" to q)
+                    Pair("x", "e") -> e.map { "$q.$x" to "$p.$it" }
                     else -> emptyList()
                 }
             }.flatten().toMutableSet()

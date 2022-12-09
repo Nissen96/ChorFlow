@@ -72,17 +72,6 @@ $ gradlew installDist
 
 The executable `ChorFlow` can then be run from `build/install/ChorFlow/bin/`.
 
-The graph visualizer used relies on the JavaScript V8 engine, and the bindings for this are OS-dependent. These are specified in `build.gradle.kts` but only one can be supplied simultaneously, the rest are commented out:
-
-```kotlin
-implementation("com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0")
-// implementation("com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0")
-// implementation("com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0")
-// implementation("com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0")
-```
-
-If you use Windows or MacOS, please comment out the Linux binding and uncomment the correct for your OS before building.
-
 ## Syntax
 
 ### Choreographies
@@ -133,7 +122,7 @@ If the conjecture is false, this *will* find a counterexample, given enough time
 
 ### Policies
 
-Policies are specified with the following syntax (comments start with `#`):
+Policies are specified with the following syntax (comments start with `#`), where `p` is a process and `p.x` a variable located at `p`:
 
 ```
 # Allow flow from p to q, s, and t
@@ -146,6 +135,9 @@ p -> q, s, t
 
 # Allow flow between s and t in both directions
 s <-> t
+
+# Data flow (allows flow from x -> y, not e.g. p -> y or x -> q)
+p.x -> q.y
 ```
 
 In the above, no flow is allowed from `q`. The following syntax can be used to show this is intentional and not an oversight:
@@ -183,6 +175,7 @@ flow(p.e -> q.x) = e -> x
 ```
 
 This mapping ignores all control flow between processes and focuses only on the explicit data flow induced when an expression is evaluated and the result stored. If the choreography is
+
 ```
 p.x := a;
 if p.(x == 42) then
@@ -191,26 +184,33 @@ else
     p."no" -> q.y;
 ; 0
 ```
+
 then the flow induced with this mapping is just
+
 ```
-a -> x
+p.a -> p.x
 ```
+
 and this is what is checked against a policy.
 
-In this example, we can infer whether `a == 42` based just on what `y` ends up to be, so there is clearly also an implicit flow, we may or may not care about. If we changed the mapping to be
+In this example, we can infer whether `p.a == 42` based just on what `q.y` ends up to be, so there is clearly also an implicit flow, we may or may not care about. If we changed the mapping to be
+
 ```
 flow(p.e) = e -> p
 flow(p.x := e) = e -> x
 flow(p.e -> q.x) = e -> x, p -> q, q -> x
 ```
+
 then the flow induced would instead be
+
 ```
-a -> x
-x -> p
+p.a -> p.x
+p.x -> p
 p -> q
-q -> y
+q -> q.y
 ```
-and give us the path `a -> x -> p -> q -> y` in the flow graph, revealing the implicit flow. To disallow this flow, the policy would need to *not* contain each of the links in this chain.
+
+and give us the path `p.a -> p.x -> p -> q -> q.y` in the flow graph, revealing the implicit flow. To disallow this flow, the policy would need to *not* contain each of the links in this chain.
 
 ## Examples
 

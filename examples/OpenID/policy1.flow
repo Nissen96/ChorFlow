@@ -1,13 +1,14 @@
 # Explicit data flow policy
 
 # Global policy
-name    -> user
-user    -> id, class
-id      -> report
-class   -> data
-data    -> info, data
-my_pwd  -> pwd
+u.name   -> rp.user
+rp.user  -> ip.id, s.class
+ip.id    -> rp.report
+s.class  -> s.data
+s.data   -> u.info, s.data
+u.my_pwd -> ip.pwd
 
 # Local policy/policies
 SendData:
-data -> info, data
+p.data -> q.info, p.data
+

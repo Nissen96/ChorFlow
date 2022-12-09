@@ -1,4 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+// Detect os to allow building with the correct bindings
+val os : OperatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+
+logger.lifecycle("*** Building ChorFlow for ${os.name} ***")
 
 plugins {
     kotlin("jvm") version "1.7.10"
@@ -26,12 +32,16 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j:2.19.0")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
 
-    // Bindings for V8, used to execute graphviz on the Javascript V8 engine
-    //implementation("com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0")
-    implementation("com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0")
-    //implementation("com.eclipsesource.j2v8:j2v8_win32_x86:4.6.0")
-    //implementation("com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0")
+    // Bindings for V8, used to execute graphviz on the Javascript V8 engine - OS-dependent
+    if (os.isWindows)
+        implementation("com.eclipsesource.j2v8:j2v8_win32_x86_64:4.6.0")
+    else if (os.isMacOsX)
+        implementation("com.eclipsesource.j2v8:j2v8_macosx_x86_64:4.6.0")
+    else
+        // Assume Linux bindings work for remaining
+        implementation("com.eclipsesource.j2v8:j2v8_linux_x86_64:4.8.0")
 
+    // Arg parsing library
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
 }
 

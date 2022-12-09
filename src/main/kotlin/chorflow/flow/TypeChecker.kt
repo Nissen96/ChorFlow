@@ -74,8 +74,20 @@ class TypeChecker(
 
         // Substitution in local policy
         val localPolicy = localPolicies[procedure.id] ?: Flow()
-        val instantiatedLocalPolicy = Flow(localPolicy.flows.map {
-            (substitutions[it.first] ?: it.first) to (substitutions[it.second] ?: it.second)
+        val instantiatedLocalPolicy = Flow(localPolicy.flows.map {flow ->
+            // Extract and substitute process id
+            val src = flow.first.split(".")
+            val dest = flow.second.split(".")
+            var mappedSrc = substitutions[src[0]]
+                ?: throw NoSuchElementException("Substitution failed for process ${src[0]}. Please check choreography and policy")
+            var mappedDest = substitutions[dest[0]]
+                ?: throw NoSuchElementException("Substitution failed for process ${dest[0]}. Please check choreography and policy")
+
+            // Add back potential variable
+            if (src.size > 1) mappedSrc += ".${src[1]}"
+            if (dest.size > 1) mappedDest += ".${dest[1]}"
+
+            mappedSrc to mappedDest
         }.toMutableSet())
 
         // check compatability with global policy
