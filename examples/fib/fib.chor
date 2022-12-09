@@ -1,0 +1,12 @@
+/* Ping pongs back and forth, computing the next Fibonacci number in x each time */
+Fib(p, q) =
+    p.x := x + y;
+    p.x -> q.y;
+    Fib(q, p); 0
+
+// Initialize values for procedure
+s.x := 0;
+t.x := 0;
+s.y := 1;
+Fib(s, t);
+0

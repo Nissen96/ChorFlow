@@ -1,0 +1,12 @@
+# Global policy
+s.x -> s.x, t.y
+s.y -> s.x
+t.x -> t.x, s.y
+t.y -> t.x
+
+# Local policy
+Fib:
+p.x -> p.x, q.y
+p.y -> p.x
+q.x -> q.x, p.y
+q.y -> q.x
