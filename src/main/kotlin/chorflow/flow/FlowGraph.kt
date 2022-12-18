@@ -36,7 +36,7 @@ class FlowGraph(flow: Flow = Flow(), private val policy: Flow? = null) {
     fun display() {
         object : JFrame("flowGraph") {
             init {
-                val label = JLabel("", ImageIcon(graph.toGraphviz().height(500).render(Format.SVG).toImage()), 0)
+                val label = JLabel("", ImageIcon(graph.toGraphviz().height(1000).render(Format.SVG).toImage()), 0)
                 add(label)
                 pack()
                 defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
@@ -46,6 +46,6 @@ class FlowGraph(flow: Flow = Flow(), private val policy: Flow? = null) {
     }
 
     fun save(file: File) {
-        graph.toGraphviz().height(500).render(Format.PNG).toFile(file)
+        graph.toGraphviz().height(1000).render(Format.PNG).toFile(file)
     }
 }
