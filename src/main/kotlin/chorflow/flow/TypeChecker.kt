@@ -41,7 +41,10 @@ class TypeChecker(
         return checkFlow(procedure.choreography, localPolicy)
     }
 
-    private fun checkFlow(choreography: Choreography, policy: Flow): Flow {
+    private fun checkFlow(choreography: Choreography?, policy: Flow): Flow {
+        if (choreography == null) {
+            return Flow()
+        }
         var flow = when (choreography.instruction) {
             is Action -> checkPolicy(choreography.instruction, policy)
             is Conditional -> checkFlow(choreography.instruction, policy)

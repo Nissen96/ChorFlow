@@ -8,7 +8,7 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     override fun visitProgram(ctx: ChorParser.ProgramContext): Program {
         return Program(
             ctx.procedureList().procedure().map { it.accept(this) as Procedure },
-            ctx.choreography().accept(this) as Choreography,
+            ctx.choreography().accept(this) as Choreography?,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )
@@ -18,7 +18,7 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
         return Procedure(
             ctx.ID().text,
             ctx.processList().process().map { it.accept(this) as Process },
-            ctx.choreography().accept(this) as Choreography,
+            ctx.choreography().accept(this) as Choreography?,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )
@@ -74,8 +74,8 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
                 lineNumber = ctx.start.line,
                 charPosition = ctx.start.charPositionInLine
             ),
-            ctx.choreography(0).accept(this) as Choreography,
-            ctx.choreography(1).accept(this) as Choreography,
+            ctx.choreography(0).accept(this) as Choreography?,
+            ctx.choreography(1).accept(this) as Choreography?,
             lineNumber = ctx.start.line,
             charPosition = ctx.start.charPositionInLine
         )

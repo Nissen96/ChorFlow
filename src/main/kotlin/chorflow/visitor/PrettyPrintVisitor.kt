@@ -23,6 +23,9 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     override fun postMidVisit(program: Program) {
         if (condensed) println()
         println("\n/* Choreography */")
+        if (program.choreography == null) {
+            print("0")
+        }
     }
 
     override fun postVisit(program: Program) {
@@ -40,6 +43,9 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     override fun postMidVisit(procedure: Procedure) {
         print(") =$separator")
         level++
+        if (procedure.choreography == null) {
+            printIndented("0")
+        }
     }
 
     override fun postVisit(procedure: Procedure) {
@@ -78,6 +84,9 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     override fun preMidVisit(conditional: Conditional) {
         print(" then$separator")
         level++
+        if (conditional.ifChoreography == null) {
+            printIndented("0" + if (condensed) "" else "\n")
+        }
     }
 
     override fun postMidVisit(conditional: Conditional) {
@@ -88,6 +97,9 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
             printIndented("else\n")
         }
         level++
+        if (conditional.elseChoreography == null) {
+            printIndented("0" + if (condensed) "" else "\n")
+        }
     }
 
     override fun postVisit(conditional: Conditional) {
