@@ -1,0 +1,10 @@
+Cust.choice -> Store.item
+Store.item -> Pay.price, Cust.result
+Pay.price -> Pay.success
+Cust.result ->
+Cust.card -> Pay.card
+Pay.card -> Pay.success
+Pay.success -> Store.success
+Store.success -> Pay.success
+Pay.cardReq -> Cust.cardReq
+Cust.cardReq -> 

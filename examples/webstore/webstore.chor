@@ -1,0 +1,11 @@
+Cust.choice -> Store.item;
+Store.getPrice(item) -> Pay.price;
+Pay.cardReq -> Cust.cardReq;
+Cust.card -> Pay.card;
+Pay.success := process(price, card);
+Pay.success -> Store.success;
+if Store.success then
+    Store.item -> Cust.result; 0
+else
+    Store."error" -> Cust.result; 0
+; 0
