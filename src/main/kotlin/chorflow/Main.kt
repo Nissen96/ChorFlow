@@ -52,8 +52,8 @@ fun parsePolicy(policyFile: File): Pair<Flow, Map<String, Flow>> {
     return policy to localPolicies
 }
 
-fun parseMapping(mappingFile: File): MappingSpec {
-    val mappingSpec = MappingSpec()
+fun parseMapping(mappingFile: File): FlowMapper {
+    val flowMapper = FlowMapper()
 
     val eventPattern = Regex("""flow\((p\.x := e | p\.e | p -> q\[L] | p\.e -> q\.x)\) = (.*)""", RegexOption.COMMENTS)
     val flowPattern = Regex("""([pqex]) (<-|<->|->) ([pqex])""", RegexOption.COMMENTS)
@@ -64,10 +64,10 @@ fun parseMapping(mappingFile: File): MappingSpec {
             val eventType = eventMatch.groupValues[1]
             val mappingList = with (eventType) {
                 when {
-                    contains("p.x:=e") -> mappingSpec.assignment
-                    contains("p->q[L]") -> mappingSpec.selection
-                    contains("p.e->q.x") -> mappingSpec.interaction
-                    contains("p.e") -> mappingSpec.conditional
+                    contains("p.x:=e") -> flowMapper.assignmentMapping
+                    contains("p->q[L]") -> flowMapper.selectionMapping
+                    contains("p.e->q.x") -> flowMapper.interactionMapping
+                    contains("p.e") -> flowMapper.conditionalMapping
                     else -> throw IllegalArgumentException("Invalid flow mapping function")
                 }
             }
@@ -89,7 +89,7 @@ fun parseMapping(mappingFile: File): MappingSpec {
         }
     }
 
-    return mappingSpec
+    return flowMapper
 }
 
 class GraphCommand : CliktCommand(help = "Display/save a flow graph for a choreography, a policy, or combined") {
@@ -129,8 +129,7 @@ class GraphCommand : CliktCommand(help = "Display/save a flow graph for a choreo
         } else {
             // Parse all provided files and generate flows through type checking
             val program = parseChoreography(chorMap!!.chor)
-            val mappingSpec = parseMapping(chorMap!!.flowmap)
-            val flowMapper = FlowMapper(mappingSpec)
+            val flowMapper = parseMapping(chorMap!!.flowmap)
             val typeChecker = TypeChecker(flowMapper, localPolicies)
             val (flow, localFlows) = typeChecker.checkFlow(program, policy)
 
@@ -177,8 +176,7 @@ class CheckCommand : CliktCommand(help = "Check the information flow of a choreo
     override fun run() {
         val program = parseChoreography(chor)
         val (policy, localPolicies) = parsePolicy(pol)
-        val mappingSpec = parseMapping(map)
-        val flowMapper = FlowMapper(mappingSpec)
+        val flowMapper = parseMapping(map)
         val typeChecker = TypeChecker(flowMapper, localPolicies)
         typeChecker.checkFlow(program, policy)
 

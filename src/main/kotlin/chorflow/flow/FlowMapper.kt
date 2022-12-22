@@ -2,7 +2,12 @@ package chorflow.flow
 
 import chorflow.ast.*
 
-class FlowMapper(private val mappingSpec: MappingSpec) {
+class FlowMapper {
+    val assignmentMapping = mutableListOf<Pair<String, String>>()
+    val conditionalMapping = mutableListOf<Pair<String, String>>()
+    val selectionMapping = mutableListOf<Pair<String, String>>()
+    val interactionMapping = mutableListOf<Pair<String, String>>()
+
     fun flow(event: Event): Flow {
         return when (event) {
             is Assignment -> flow(event)
@@ -19,7 +24,7 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         val e = assignment.expression.variables
 
         return Flow(
-            mappingSpec.assignment.map { f ->
+            assignmentMapping.map { f ->
                 when (f) {
                     Pair("p", "x") -> listOf(p to "$p.$x")
                     Pair("x", "p") -> listOf("$p.$x" to p)
@@ -38,7 +43,7 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         val e = guard.expression.variables
 
         return Flow(
-            mappingSpec.conditional.map { f ->
+            conditionalMapping.map { f ->
                 when (f) {
                     Pair("p", "e") -> e.map { p to "$p.$it" }
                     Pair("e", "p") -> e.map { "$p.$it" to p }
@@ -55,7 +60,7 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         val x = interaction.destinationVariable
 
         return Flow(
-            mappingSpec.interaction.map { f ->
+            interactionMapping.map { f ->
                 when (f) {
                     Pair("p", "e") -> e.map { p to "$p.$it" }
                     Pair("p", "q") -> listOf(p to q)
@@ -80,7 +85,7 @@ class FlowMapper(private val mappingSpec: MappingSpec) {
         val q = selection.destinationProcess.id
 
         return Flow(
-            mappingSpec.selection.mapNotNull {
+            selectionMapping.mapNotNull {
                 when (it) {
                     Pair("p", "q") -> p to q
                     Pair("q", "p") -> q to p
