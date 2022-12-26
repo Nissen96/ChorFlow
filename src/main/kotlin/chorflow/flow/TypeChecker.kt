@@ -13,7 +13,7 @@ class TypeChecker(
     private lateinit var procedures: List<Procedure>
 
     private fun checkPolicy(event: Event, policy: Flow): Flow {
-        // Map event to its flows and checkFlow satisfaction
+        // Map event to its flows and check flow satisfaction
         val flow = flowMapper.flow(event)
         if (!flow.isSubflow(policy)) {
             // Mark each violation
@@ -77,7 +77,7 @@ class TypeChecker(
 
         // Substitution in local policy
         val localPolicy = localPolicies[procedure.id] ?: Flow()
-        val instantiatedLocalPolicy = Flow(localPolicy.flows.map {flow ->
+        val instantiatedLocalPolicy = Flow(localPolicy.flows.map { flow ->
             // Extract and substitute process id
             val src = flow.first.split(".")
             val dest = flow.second.split(".")
@@ -93,7 +93,7 @@ class TypeChecker(
             mappedSrc to mappedDest
         }.toMutableSet())
 
-        // check compatability with global policy
+        // Check compatibility with global policy
         if (!instantiatedLocalPolicy.isSubflow(policy)) {
             instantiatedLocalPolicy.flows.forEach {
                 if (it !in policy) {

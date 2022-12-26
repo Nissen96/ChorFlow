@@ -34,7 +34,7 @@ class FlowGraph(flow: Flow = Flow(), private val policy: Flow? = null) {
     }
 
     fun display() {
-        object : JFrame("flowGraph") {
+        object : JFrame("Flow Graph") {
             init {
                 val label = JLabel("", ImageIcon(graph.toGraphviz().height(1000).render(Format.SVG).toImage()), 0)
                 add(label)

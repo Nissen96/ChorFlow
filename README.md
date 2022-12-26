@@ -118,7 +118,7 @@ Search(s1, s2);
 0
 ```
 
-If the conjecture is false, this *will* find a counterexample, given enough time - that's how good choreographies are.
+This has a single procedure `Search` which calls itself recursively until finding a counterexample, for swapping the process order for each call. The main choreography simply initializes a value and invokes the procedure.
 
 ### Policies
 
