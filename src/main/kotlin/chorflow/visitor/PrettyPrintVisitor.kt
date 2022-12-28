@@ -7,13 +7,16 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     private val separator = if (condensed) " " else "\n"
 
     private fun printIndented(text: Any = "") {
-        if (!condensed)
+        if (!condensed) {
             print(" ".repeat(indentation * level))
+        }
         print(text)
     }
 
     override fun preVisit(program: Program) {
-        println("/* Procedure Definitions */")
+        if (program.procedures.isNotEmpty() && !condensed) {
+            println("/* Procedure Definitions */")
+        }
     }
 
     override fun preMidVisit(program: Program) {
@@ -21,15 +24,21 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun postMidVisit(program: Program) {
-        if (condensed) println()
-        println("\n/* Choreography */")
+        if (program.procedures.isNotEmpty()) {
+            println()
+        }
+        if (!condensed) {
+            println("/* Choreography */")
+        }
         if (program.choreography == null) {
             print("0")
         }
     }
 
     override fun postVisit(program: Program) {
-        if (condensed) println()
+        if (condensed) {
+            println()
+        }
     }
 
     override fun preVisit(procedure: Procedure) {

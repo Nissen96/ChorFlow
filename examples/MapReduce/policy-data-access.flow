@@ -1,0 +1,50 @@
+p0 -> p0.list, p0.x, p0.y, p0.z, p0.result, p0.result2
+p1 -> p1.x, p1.y
+p2 -> p2.x, p2.y, p2.z, p2.result, p2.list
+p3 -> p3.x, p3.y
+p0.list -> p0
+p0.x -> p0
+p0.y -> p0
+p0.z -> p0
+p0.result -> p0
+p0.result2 -> p0
+p1.x -> p1
+p1.y -> p1
+p2.list -> p2
+p2.x -> p2
+p2.y -> p2
+p2.z -> p2
+p2.result -> p2
+p3.x -> p3
+p3.y -> p3
+
+Process2:
+p -> p.x, p.y, p.z, p.result
+q -> q.x, q.y
+p.list -> p
+p.x -> p
+p.y -> p
+p.z -> p
+q.x -> q
+q.y -> q
+
+Process4:
+r -> r.x, r.y, r.z, r.result, r.result2
+s -> s.x, s.y
+t -> t.list, t.x, t.y, t.z, t.result
+u -> u.x, u.y
+r.list -> r
+r.x -> r
+r.y -> r
+r.z -> r
+r.result -> r
+r.result2 -> r
+s.x -> s
+s.y -> s
+t.list -> t
+t.x -> t
+t.y -> t
+t.z -> t
+t.result -> t
+u.x -> u
+u.y -> u

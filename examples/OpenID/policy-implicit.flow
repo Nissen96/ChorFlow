@@ -1,0 +1,14 @@
+# Explicit + implicit flow policy
+User.id -> RP.id, IP.id
+RP.id -> IP.id
+IP.id -> User.salt
+User.salt -> User.hash
+User.password -> User.hash
+User.hash -> IP.hash
+IP.hash -> IP.valid
+IP.token -> User.token, RP.token
+IP.valid -> IP
+
+User -> RP, IP, User.salt, User.hash, User.token
+RP -> User, IP, RP.id, RP.token
+IP -> User, RP, IP.id, IP.hash, IP.valid, IP.token

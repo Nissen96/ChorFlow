@@ -1,27 +1,16 @@
-/* Procedures */
-SendData(p, q) =
-    if p.data != 0 then
-        p -> q[continue];
-        p.data -> q.info;
-        p.data := next(data);
-        SendData(p, q); 0
-    else
-        p -> q[end];
-        p."end" -> q.info; 0
-    ; 0
-
-/* Choreography */
-u.name -> rp.user;
-rp.user -> ip.id;
-u.my_pwd -> ip.pwd;
-if ip.check(id, pwd) then
-    ip -> rp[ok];
-    rp.class(user) -> s.class; 0
+User.id -> RP.id;
+RP.id -> IP.id;
+IP.getSalt(id) -> User.salt;
+User.hash := calcHash(salt, password);
+User.hash -> IP.hash;
+IP.valid := check(hash);
+if IP.valid then
+    IP -> User[OK];
+    IP -> RP[OK];
+    IP.token := createToken();
+    IP.token -> User.token;
+    IP.token -> RP.token; 0
 else
-    ip -> rp[fail];
-    rp."na" -> s.class;
-    ip.rep(id) -> rp.report;
-    s.data := first(class);
-    SendData(s, u);
-    0
+    IP -> User[KO];
+    IP -> RP[KO]; 0
 ; 0

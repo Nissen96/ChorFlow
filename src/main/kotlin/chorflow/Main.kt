@@ -27,7 +27,7 @@ fun parseChoreography(choreographyFile: File): Program {
     return ASTVisitor().visit(chorParser.program()) as Program
 }
 
-fun parsePolicy(policyFile: File): Pair<Flow, Map<String, Flow>> {
+fun parsePolicy(policyFile: File, procedureNames: List<String> = emptyList()): Pair<Flow, Map<String, Flow>> {
     val policy = Flow()
     val localPolicies = mutableMapOf<String, Flow>()
 
@@ -49,6 +49,11 @@ fun parsePolicy(policyFile: File): Pair<Flow, Map<String, Flow>> {
             }
         }
     }
+
+    if (procedureNames.isNotEmpty() && localPolicies.map { it.key } != procedureNames) {
+        throw IllegalStateException("Local policies do not match actual program procedure names")
+    }
+
     return policy to localPolicies
 }
 
@@ -175,7 +180,7 @@ class CheckCommand : CliktCommand(help = "Check the information flow of a choreo
 
     override fun run() {
         val program = parseChoreography(chor)
-        val (policy, localPolicies) = parsePolicy(pol)
+        val (policy, localPolicies) = parsePolicy(pol, program.procedures.map { it.id })
         val flowMapper = parseMapping(map)
         val typeChecker = TypeChecker(flowMapper, localPolicies)
         typeChecker.checkFlow(program, policy)
@@ -194,7 +199,7 @@ class CheckCommand : CliktCommand(help = "Check the information flow of a choreo
         if (errorMsg.isNotBlank()) {
             println("\u001B[31m$errorMsg\u001B[0m")
         } else {
-            println("\u001B[32mNo flow violations found, good job!\u001B[0m")
+            println("\u001B[32mNo flow violations found!\u001B[0m")
         }
     }
 }

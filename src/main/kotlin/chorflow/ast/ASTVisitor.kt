@@ -114,9 +114,10 @@ class ASTVisitor : ChorBaseVisitor<ASTNode>() {
     override fun visitExpression(ctx: ChorParser.ExpressionContext): Expression {
         // No need to actually handle expressions, we are only interested in the variables for the flow
         val variables = mutableSetOf<String>()
-        if (ctx.ID() != null && ctx.expression().isEmpty()) {
+        if (ctx.ID() != null && ctx.expression().isEmpty() && "(" !in ctx.text) {
             variables.add(ctx.ID().text)
         }
+
         ctx.expression().forEach { variables.addAll((it.accept(this) as Expression).variables) }
 
         return Expression(

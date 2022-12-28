@@ -1,0 +1,10 @@
+# Explicit data flow policy
+
+User.id -> RP.id, IP.id
+RP.id -> IP.id
+IP.id -> User.salt
+User.salt -> User.hash
+User.password -> User.hash
+User.hash -> IP.hash
+IP.hash -> IP.valid
+IP.token -> User.token, RP.token

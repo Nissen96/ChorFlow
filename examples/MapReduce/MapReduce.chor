@@ -1,0 +1,26 @@
+Process2(p, q) =
+    // Map one element at both p and q in parallel
+    p.x := get(list, 0);
+    p.get(list, 1) -> q.x;
+    p.y := map(x);
+    q.y := map(x);
+
+    // Get result and reduce
+    q.y -> p.z;
+    p.result := reduce(y, z);
+    0
+,
+Process4(r, s, t, u) =
+    // Send half the list to r for parallel processing
+    r.slice(list, 2, 4) -> t.list;
+    Process2(r, s);
+    Process2(t, u);
+
+    // Get result and reduce
+    t.result -> r.result2;
+    r.result := reduce(result, result2);
+    0
+
+p0.list := (5, 3, 2, 9);
+Process4(p0, p1, p2, p3);
+0

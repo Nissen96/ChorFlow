@@ -214,23 +214,23 @@ and give us the path `p.a -> p.x -> p -> q -> q.y` in the flow graph, revealing 
 
 ## Examples
 
-A few example choreographies and corresponding policies can be found in `examples`. Flow mappings can be created from `template.map` in `flowmaps/` where a few sample mappings can be found as well.
+A few example choreographies and corresponding policies can be found in `examples/`. Flow mappings can be created from `template.map` in `flowmaps/` where a few sample mappings can be found as well.
 
 
 Example with no flow violations:
 
 ```bash
-$ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy2.flow flowmaps/explicit-implicit-flow.map
+$ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy-implicit.flow flowmaps/explicit-implicit-flow.map
 ```
 
 Same flow violates a stricter policy:
 
 ```bash
-$ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy1.flow flowmaps/explicit-implicit-flow.map
+$ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy-explicit.flow flowmaps/explicit-implicit-flow.map
 ```
 
 but not if only the explicit data flows are induced by the mapping:
 
 ```bash
-$ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy1.flow flowmaps/explicit-data-flow.map
+$ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy-explicit.flow flowmaps/explicit-data-flow.map
 ```
