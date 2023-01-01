@@ -11,7 +11,7 @@ Process2(p, q) =
     0
 ,
 Process4(r, s, t, u) =
-    // Send half the list to r for parallel processing
+    // Send half the list to t for parallel processing
     r.slice(list, 2, 4) -> t.list;
     Process2(r, s);
     Process2(t, u);
