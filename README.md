@@ -4,7 +4,7 @@ Information Flow Analysis for Choregraphic Programs
 
 ## Instructions
 
-Binaries have been pre-built for Linux (`chorflow`) and Windows 64-bit (`chorflow.bat`).
+The project has been pre-built and can be run on Linux with `chorflow` and Windows 64-bit with `chorflow.bat`.
 
 The program defines three commands, `check`, `graph`, and `pprint`:
 
@@ -87,7 +87,7 @@ C : I; C    # Sequential composition
 I : p.x := e                # Assignment
   | p.e -> q.x              # Interaction
   | p -> q[l]               # Selection
-  | if (p.e) then C else C  # Conditional
+  | if p.e then C else C    # Conditional
   | X(p, q, ...)            # Procedure call
 
 P : X(p, q, ...) = C, P     # Procedure definition
@@ -118,7 +118,7 @@ Search(s1, s2);
 0
 ```
 
-This has a single procedure `Search` which calls itself recursively until finding a counterexample, for swapping the process order for each call. The main choreography simply initializes a value and invokes the procedure.
+This has a single procedure `Search` which calls itself recursively until finding a counterexample, swapping the process order for each call. The main choreography simply initializes a value and invokes the procedure.
 
 ### Policies
 
@@ -133,9 +133,6 @@ p -> t
 # Shorthand for above
 p -> q, s, t
 
-# Allow flow between s and t in both directions
-s <-> t
-
 # Data flow (allows flow from x -> y, not e.g. p -> y or x -> q)
 p.x -> q.y
 ```
@@ -149,9 +146,10 @@ q ->
 
 This is strictly syntactical and has no effect. In particular, it does not *disallow* flow, so if `q -> p` is also specified somewhere in the policy, then flow from `q` to `p` *is* allowed.
 
+
 ### Flow Mappings
 
-Flow mappings define what flows each type of choreography *event* induces. This depends on the use case and can be specified with high granularity. The following template can be used as a starting point and induces all possible flow for each event:
+Flow mappings define what flows each type of choreography *event* induces. This depends on the use case and can be specified with high granularity. The following template can be used as a starting point and generates all possible flow for each event:
 
 ```
 # Conditional
@@ -210,7 +208,7 @@ p -> q
 q -> q.y
 ```
 
-and give us the path `p.a -> p.x -> p -> q -> q.y` in the flow graph, revealing the implicit flow. To disallow this flow, the policy would need to *not* contain each of the links in this chain.
+and give us the path `p.a -> p.x -> p -> q -> q.y` in the flow graph, revealing the implicit flow. To disallow this flow, at least one of these links must be absent in the policy.
 
 ## Examples
 
@@ -233,4 +231,28 @@ but not if only the explicit data flows are induced by the mapping:
 
 ```bash
 $ chorflow check examples/OpenID/OpenID.chor examples/OpenID/policy-explicit.flow flowmaps/explicit-data-flow.map
+```
+
+Visualize a policy flow:
+
+```bash
+$ chorflow graph --pol examples/OpenID/policy-explicit.flow --display
+```
+
+Visualize a choreography flow based on a mapping:
+
+```bash
+$ chorflow graph --chor examples/OpenID/OpenID.chor --map flowmaps/explicit-data-flow.map --display
+```
+
+Get a combined view of choreographic flow and policy, saving the results to the folder `graphs/` (folder must exist):
+
+```bash
+$ chorflow graph --chor examples/OpenID/OpenID.chor --pol examples/OpenID/policy-explicit.flow --map flowmaps/explicit-data-flow.map --save --out graphs
+```
+
+Pretty print a choreography, indenting using 2 spaces:
+
+```bash
+$ chorflow pprint examples/OpenID/OpenID.chor --indent 2
 ```
