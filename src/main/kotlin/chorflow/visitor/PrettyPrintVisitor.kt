@@ -66,11 +66,9 @@ class PrettyPrintVisitor(private val indentation: Int = 4, private val condensed
     }
 
     override fun postVisit(choreography: Choreography) {
-        print(";")
+        print(";$separator")
         if (choreography.continuation == null) {
-            print(" 0${if (condensed) "" else "\n"}")
-        } else {
-            print(separator)
+            printIndented("0${if (condensed) "" else "\n"}")
         }
     }
 
